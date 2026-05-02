@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!--
+    Lift modülü.
+
+    Geometri (chassis_link referansı, x=ileri, z=yukarı):
+      - Kolon: robotun en arkasına yerleştirilmiş, base arka yüzüyle flush.
+               Kolon merkezi x = -(base_length/2 - lift_column_size/2) = -0.28
+      - Platform: arka kenarı tam kolon ön yüzeyine değecek şekilde konumlandırılmış
+                  (iç içe değil, sadece temas ediyor).
+               Lift joint origin x = column_front + lift_length/2
+                                   = -0.26 + 0.25 = -0.01
+               → Lift arka: -0.26  Lift ön: +0.24
+
+    Platform başlangıç yüksekliği: base_height + lift_z_offset = 0.26 m (LiDAR üstünde)
+    Hareket aralığı: 0.0 .. lift_max (0.15 m)
+    Komut: /lift_cmd (std_msgs/Float64) → JointPositionController
+  -->
+
+  <!-- Merkezi direk: en arkada, chassis_link'e sabit -->
+  <link name="lift_column_link">
+    <visual>
+      <origin xyz="0 0 ${lift_column_height/2}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${lift_column_size} ${lift_column_size} ${lift_column_height}"/>
+      </geometry>
+      <material name="chassis_blue"/>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 ${lift_column_height/2}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${lift_column_size} ${lift_column_size} ${lift_column_height}"/>
+      </geometry>
+    </collision>
+
+    <xacro:inertial_box mass="${lift_column_mass}"
+                        x="${lift_column_size}" y="${lift_column_size}" z="${lift_column_height}">
+      <origin xyz="0 0 ${lift_column_height/2}" rpy="0 0 0"/>
+    </xacro:inertial_box>
+  </link>
+
+  <joint name="lift_column_joint" type="fixed">
+    <parent link="chassis_link"/>
+    <child  link="lift_column_link"/>
+    <!-- Kolon merkezi: base arka yüzünden lift_column_size/2 içeride, chassis üstünde -->
+    <origin xyz="${-(base_length/2 - lift_column_size/2)} 0 ${base_height}" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Lift platformu: kolon ön yüzüne temas eden arka kenarıyla öne doğru uzanır -->
+  <link name="lift_link">
+    <visual>
+      <origin xyz="0 0 ${lift_height/2}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${lift_length} ${lift_width} ${lift_height}"/>
+      </geometry>
+      <material name="lift_orange"/>
+    </visual>
+
+    <collision>
+      <origin xyz="0 0 ${lift_height/2}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${lift_length} ${lift_width} ${lift_height}"/>
+      </geometry>
+    </collision>
+
+    <xacro:inertial_box mass="${lift_mass}"
+                        x="${lift_length}" y="${lift_width}" z="${lift_height}">
+      <origin xyz="0 0 ${lift_height/2}" rpy="0 0 0"/>
+    </xacro:inertial_box>
+  </link>
+
+  <joint name="lift_joint" type="prismatic">
+    <parent link="chassis_link"/>
+    <child  link="lift_link"/>
+    <!-- x: kolon ön yüzeyi(-0.26) + lift_length/2(0.25) = -0.01 -->
+    <origin xyz="${lift_length/2 - base_length/2 + lift_column_size} 0 ${base_height + lift_z_offset}"
+            rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="${lift_min}" upper="${lift_max}"
+           effort="${lift_effort}" velocity="${lift_velocity}"/>
+    <dynamics damping="20.0" friction="5.0"/>
+  </joint>
+
+</robot>

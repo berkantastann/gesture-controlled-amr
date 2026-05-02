@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="amr">
+
+  <!--
+    AMR (Autonomous Mobile Robot) — fabrika içi yük taşıma + lift
+    Driver: Ignition Gazebo Fortress + ROS 2 Humble
+
+    Modüler yapı:
+      common/    -> sabitler, malzemeler, atalet makroları
+      base/      -> base_footprint + base_link + chassis
+      wheels/    -> 2 sürücü tekerleği + 2 caster
+      lift/      -> prismatic lift platformu
+      sensors/   -> imu, lidar, rgb_camera, depth_camera
+      gazebo/    -> Ignition aktüatör eklentileri (sonra ros2_control ile değişir)
+  -->
+
+  <!-- Ortak makrolar ve sabitler -->
+  <xacro:include filename="$(find robot_description)/urdf/common/properties.xacro"/>
+  <xacro:include filename="$(find robot_description)/urdf/common/materials.xacro"/>
+  <xacro:include filename="$(find robot_description)/urdf/common/inertial_macros.xacro"/>
+
+  <!-- Mekanik parçalar -->
+  <xacro:include filename="$(find robot_description)/urdf/base/base.xacro"/>
+  <xacro:include filename="$(find robot_description)/urdf/wheels/wheels.xacro"/>
+  <xacro:include filename="$(find robot_description)/urdf/lift/lift.xacro"/>
+
+  <!-- Sensörler -->
+  <xacro:include filename="$(find robot_description)/urdf/sensors/imu.xacro"/>
+  <xacro:include filename="$(find robot_description)/urdf/sensors/lidar.xacro"/>
+  <xacro:include filename="$(find robot_description)/urdf/sensors/rgb_camera.xacro"/>
+  <xacro:include filename="$(find robot_description)/urdf/sensors/depth_camera.xacro"/>
+
+  <!-- Gazebo aktüatör eklentileri (ros2_control eklenince bu satırı kapat) -->
+  <xacro:include filename="$(find robot_description)/urdf/gazebo/gazebo_control.xacro"/>
+
+</robot>
