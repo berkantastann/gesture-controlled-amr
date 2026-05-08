@@ -11,7 +11,7 @@
       wheels/    -> 2 sürücü tekerleği + 2 caster
       lift/      -> prismatic lift platformu
       sensors/   -> imu, lidar, rgb_camera, depth_camera
-      gazebo/    -> Ignition aktüatör eklentileri (sonra ros2_control ile değişir)
+      control/   -> ros2_control donanım arabirimi + ign_ros2_control plugin
   -->
 
   <!-- Ortak makrolar ve sabitler -->
@@ -30,7 +30,7 @@
   <xacro:include filename="$(find robot_description)/urdf/sensors/rgb_camera.xacro"/>
   <xacro:include filename="$(find robot_description)/urdf/sensors/depth_camera.xacro"/>
 
-  <!-- Gazebo aktüatör eklentileri (ros2_control eklenince bu satırı kapat) -->
-  <xacro:include filename="$(find robot_description)/urdf/gazebo/gazebo_control.xacro"/>
+  <!-- ros2_control + ign_ros2_control plugin (cmd_vel, odom, lift, joint_states) -->
+  <xacro:include filename="$(find robot_description)/urdf/control/ros2_control.xacro"/>
 
 </robot>

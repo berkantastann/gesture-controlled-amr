@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!--
+    ros2_control entegrasyonu (Ignition Gazebo Fortress + ROS 2 Humble).
+
+    İçerik:
+      - ros2_control "system" donanım arabirimi (ign_ros2_control/IgnitionSystem)
+        * left_wheel_joint  : velocity command + position/velocity state
+        * right_wheel_joint : velocity command + position/velocity state
+        * lift_joint        : position command + position/velocity state
+      - Ignition tarafında controller_manager'ı ayağa kaldıran plugin
+        (ign_ros2_control-system) — controllers.yaml'ı yükler.
+
+    Topic'ler (controller_manager bunları yayınlar/dinler):
+      /cmd_vel                                -> launch'taki relay ile
+                                                 /diff_drive_controller/cmd_vel_unstamped
+      /diff_drive_controller/odom             -> nav_msgs/Odometry
+      /tf (odom->base_footprint)              -> diff_drive_controller
+      /lift_controller/commands               -> std_msgs/Float64MultiArray (tek elemanlı)
+      /joint_states                           -> joint_state_broadcaster
+  -->
+
+  <xacro:property name="controllers_yaml"
+                  value="$(find robot_description)/config/controllers.yaml"/>
+
+  <ros2_control name="IgnitionSystem" type="system">
+    <hardware>
+      <plugin>ign_ros2_control/IgnitionSystem</plugin>
+    </hardware>
+
+    <joint name="left_wheel_joint">
+      <command_interface name="velocity">
+        <param name="min">-10.0</param>
+        <param name="max">10.0</param>
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+
+    <joint name="right_wheel_joint">
+      <command_interface name="velocity">
+        <param name="min">-10.0</param>
+        <param name="max">10.0</param>
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+
+    <joint name="lift_joint">
+      <!-- ign_ros2_control (Humble): position komutu için P-gain zorunlu -->
+      <param name="position_proportional_gain">50.0</param>
+      <command_interface name="position">
+        <param name="min">${lift_min}</param>
+        <param name="max">${lift_max}</param>
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+  </ros2_control>
+
+  <gazebo>
+    <plugin filename="ign_ros2_control-system"
+            name="ign_ros2_control::IgnitionROS2ControlPlugin">
+      <parameters>${controllers_yaml}</parameters>
+    </plugin>
+  </gazebo>
+
+</robot>
