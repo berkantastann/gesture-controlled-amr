@@ -48,11 +48,11 @@
     </joint>
 
     <joint name="lift_joint">
-      <!-- ign_ros2_control (Humble): position komutu için P-gain zorunlu -->
-      <param name="position_proportional_gain">50.0</param>
-      <command_interface name="position">
-        <param name="min">${lift_min}</param>
-        <param name="max">${lift_max}</param>
+      <!-- gz_ros2_control Fortress'ta JointVelocityCmd prismatik joint + yerçekimi ile çalışmıyor.
+           effort = lift_mass * g + ekstra = ~20 N tutma, >20 N kaldırma, <20 N indirme -->
+      <command_interface name="effort">
+        <param name="min">-${lift_effort}</param>
+        <param name="max">${lift_effort}</param>
       </command_interface>
       <state_interface name="position"/>
       <state_interface name="velocity"/>

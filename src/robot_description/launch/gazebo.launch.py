@@ -107,6 +107,14 @@ def generate_launch_description():
             on_exit=[diff_drive_spawner, lift_spawner],
         )
     )
+    
+    rviz_node  = Node(
+        package='rviz2',
+        executable='rviz2',
+        parameters=[{'use_sim_time': True,}],
+        arguments=['-d', os.path.join(pkg_share, 'rviz', 'base.rviz')],
+        
+    )
 
     return LaunchDescription([
         ign_gazebo,
@@ -116,4 +124,5 @@ def generate_launch_description():
         cmd_vel_relay,
         after_spawn_jsb,
         after_jsb_diff_and_lift,
+        rviz_node,
     ])

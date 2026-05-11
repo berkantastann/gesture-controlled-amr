@@ -15,7 +15,8 @@
 
     Platform başlangıç yüksekliği: base_height + lift_z_offset = 0.26 m (LiDAR üstünde)
     Hareket aralığı: 0.0 .. lift_max (0.15 m)
-    Komut: /lift_cmd (std_msgs/Float64) → JointPositionController
+    
+    Çalışan Komut : os2 topic pub - -once /lift_controller/commands std_msgs/msg/Float64MultiArray "data: [-30.0]"
   -->
 
   <!-- Merkezi direk: en arkada, chassis_link'e sabit -->
@@ -80,7 +81,7 @@
     <axis xyz="0 0 1"/>
     <limit lower="${lift_min}" upper="${lift_max}"
            effort="${lift_effort}" velocity="${lift_velocity}"/>
-    <dynamics damping="20.0" friction="5.0"/>
+    <dynamics damping="5.0" friction="0.5"/>
   </joint>
 
 </robot>

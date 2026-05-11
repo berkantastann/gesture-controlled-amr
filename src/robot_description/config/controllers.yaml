@@ -15,7 +15,7 @@ controller_manager:
       type: diff_drive_controller/DiffDriveController
 
     lift_controller:
-      type: position_controllers/JointGroupPositionController
+      type: effort_controllers/JointGroupEffortController
 
 
 diff_drive_controller:
