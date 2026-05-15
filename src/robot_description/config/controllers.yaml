@@ -22,12 +22,21 @@ diff_drive_controller:
   ros__parameters:
     use_sim_time: true
 
+    qos_overrides:
+      /tf:
+        publisher:
+          durability: volatile
+          reliability: reliable
+          history: keep_last
+          depth: 100
+
     left_wheel_names:  ["left_wheel_joint"]
     right_wheel_names: ["right_wheel_joint"]
 
     wheel_separation: 0.44
     wheel_radius: 0.075
 
+    # Simülasyonda geometri tam eşleştiği için 1.0; gerçek robotta ölçüm yaparak ayarla
     wheel_separation_multiplier: 1.0
     left_wheel_radius_multiplier: 1.0
     right_wheel_radius_multiplier: 1.0
@@ -40,6 +49,7 @@ diff_drive_controller:
     twist_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]
 
     open_loop: false
+    position_feedback: true
     enable_odom_tf: true
 
     cmd_vel_timeout: 0.5
