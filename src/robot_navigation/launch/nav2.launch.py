@@ -19,7 +19,7 @@ def generate_launch_description():
     )
     map_arg = DeclareLaunchArgument(
         'map',
-        default_value=os.path.join(nav_share, 'maps', 'empty.map.yaml'),
+        default_value=os.path.join(nav_share, 'maps', 'map_no_point.yaml'),
         description='Kullanılacak harita YAML dosyasının tam yolu',
     )
     params_file_arg = DeclareLaunchArgument(
