@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!--
+    Ignition Gazebo Fortress - OdometryPublisher System Plugin
+    Fizik motorunun gercek model pozisyonundan ground truth odom uretir;
+    tekerlek enkoderi kaymasi veya suruklenme hatasi icermez.
+
+    Frame mimarisi (cakismayi onlemek icin):
+      - <odom_frame>     : ground_truth_odom  (diff_drive 'odom' frame'inden AYRI)
+      - <robot_base_frame>: base_footprint    (plugin default'u; en stabil sonuc)
+      - <tf_topic>       : Gazebo dahili topic'e yonlendirildi; ROS /tf'e bridge edilmiyor
+
+    Topic akisi:
+      Gazebo /model/amr/odometry  ->  ros_gz_bridge  ->  /ground_truth/odom
+      header.frame_id            : ground_truth_odom
+      child_frame_id             : base_footprint
+
+    RViz'de karsilastirmak icin full.launch.py icinde static TF:
+      odom  ->  ground_truth_odom  (identity, t=0)
+    yayinlanir. Boylece her iki odom (diff_drive + EKF + ground_truth) ayni fixed
+    frame'de gorulur ve dogrudan karsilastirma mumkun olur.
+
+    Navigasyon icin /odometry/filtered (EKF) kullanilir; bu topic yalnizca
+    degerlendirme / karsilastirma amaclidir, TF tree'ye dahil degildir.
+  -->
+  <gazebo>
+    <plugin filename="ignition-gazebo-odometry-publisher-system"
+            name="ignition::gazebo::systems::OdometryPublisher">
+      <!-- Ayrik frame; diff_drive 'odom' ile cakismaz -->
+      <odom_frame>ground_truth_odom</odom_frame>
+
+      <!-- base_footprint: plugin default'u; Ignition'da kanonik referans olarak
+           garantili calisir (chassis_link override edildiginde pozisyon offset hatasi olusuyor) -->
+      <robot_base_frame>base_footprint</robot_base_frame>
+
+      <!-- 50 Hz yayin (0.02 s) -->
+      <publish_period>0.02</publish_period>
+
+      <!-- 2D diferansiyel surucu; yalnizca x, y, yaw izlenir -->
+      <dimensions>2</dimensions>
+
+      <!-- Plugin default'ta /model/amr/tf'e TF yayinlar; ros_gz_bridge'de bridge
+           edilmediginden ROS /tf'i etkilemez. Yine de aciklik icin ayri tutuyoruz. -->
+      <tf_topic>/model/amr/ground_truth_tf</tf_topic>
+    </plugin>
+  </gazebo>
+
+</robot>

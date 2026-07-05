@@ -80,10 +80,12 @@
               rpy="0 0 0"/>
     </joint>
 
-    <!-- Caster küreleri serbest dönsün diye düşük sürtünme -->
+    <!-- Caster küreleri serbest dönsün diye çok düşük sürtünme.
+         Yerinde dönerken 0.05 hâlâ direnç yaratıp drive wheel'larda gizli kayma
+         (encoder vyaw hatası) oluşturuyordu; 0.001 ile pratik olarak sürtünmesiz. -->
     <gazebo reference="${prefix}_caster_link">
-      <mu1>0.05</mu1>
-      <mu2>0.05</mu2>
+      <mu1>0.001</mu1>
+      <mu2>0.001</mu2>
     </gazebo>
   </xacro:macro>
 

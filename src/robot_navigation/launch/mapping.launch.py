@@ -53,6 +53,17 @@ def generate_launch_description():
     )
 
 
+    ekf_node = Node(
+        package='robot_localization',
+        executable='ekf_node',
+        name='ekf_filter_node',
+        output='screen',
+        parameters=[
+            os.path.join(nav_share, 'params', 'ekf_params.yaml'),
+            {'use_sim_time': use_sim_time},
+        ],
+    )
+
     slam_toolbox_node = Node(
         package='slam_toolbox',
         executable='async_slam_toolbox_node',
@@ -81,5 +92,6 @@ def generate_launch_description():
         use_rviz_arg,
         rviz_config_arg,
         bringup_launch,
+        ekf_node,
         slam_toolbox_node,
     ])

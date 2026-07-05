@@ -1,0 +1,16 @@
+# AMR görev noktaları
+#
+# Format: "x;y;theta"
+#   x, y  — metre cinsinden, map frame'ine göre
+#   theta  — radyan cinsinden yön
+#             0.0    = +X yönü (ileri)
+#             1.5708 = +Y yönü (sol)
+#             3.1416 = -X yönü (geri)
+#
+# Gazebo boş dünyada robot (0,0,0)'dan spawn olur.
+# SLAM ile harita çizildikten sonra gerçek koordinatlarla güncelle.
+
+mission_executor:
+  ros__parameters:
+    point_A: "3.0;0.0;0.0"    # Yük alma noktası — 3m ileri, +X yönüne bak
+    point_B: "0.0;3.0;1.5708" # Yük bırakma noktası — 3m sola, +Y yönüne bak

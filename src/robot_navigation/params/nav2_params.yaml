@@ -1,7 +1,7 @@
 # Nav2 parametreleri — AMR robotu için
 # Chassis: 0.60x0.40m, wheel_sep=0.44m, radius=0.075m
 # LiDAR: /scan, 360°, 12m maks.
-# Odom: /diff_drive_controller/odom (diff_drive_controller çıkışı)
+# Odom: /odometry/filtered (EKF füzyonu: tekerlek enkoderi + IMU)
 
 amcl:
   ros__parameters:
@@ -43,16 +43,26 @@ amcl:
     z_rand: 0.5
     z_short: 0.05
     scan_topic: scan
+    # Robot Gazebo'da (0,0,0)'dan spawn olur — elle pose vermek gerekmez
+    set_initial_pose: true
+    initial_pose:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      yaw: 0.0
 
 bt_navigator:
   ros__parameters:
     use_sim_time: True
     global_frame: map
     robot_base_frame: base_footprint
-    odom_topic: /diff_drive_controller/odom
+    odom_topic: /odometry/filtered
     bt_loop_duration: 10
     default_server_timeout: 20
     wait_for_service_timeout: 1000
+    enable_groot_monitoring: true
+    groot_zmq_publisher_port: 1668
+    groot_zmq_server_port: 1669
     plugin_lib_names:
       - nav2_compute_path_to_pose_action_bt_node
       - nav2_compute_path_through_poses_action_bt_node
@@ -329,7 +339,7 @@ velocity_smoother:
     min_velocity: [-0.5, 0.0, -1.0]
     max_accel: [1.0, 0.0, 2.0]
     max_decel: [-1.0, 0.0, -2.0]
-    odom_topic: /diff_drive_controller/odom
+    odom_topic: /odometry/filtered
     odom_duration: 0.1
     deadband_velocity: [0.0, 0.0, 0.0]
     velocity_timeout: 1.0

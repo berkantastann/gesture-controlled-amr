@@ -1,0 +1,91 @@
+# robot_localization EKF (Extended Kalman Filter) konfigürasyonu
+# Füzyon: /diff_drive_controller/odom  (tekerlek enkoderi - sadece hız)
+#       + /imu                          (ataletsel ölçüm birimi - yaw + vyaw)
+# Çıkış:  /odometry/filtered           (nav_msgs/Odometry)
+#         odom -> base_footprint TF    (EKF yayınlar; diff_drive enable_odom_tf=false)
+
+ekf_filter_node:
+  ros__parameters:
+
+    # --------------- Temel parametreler ---------------
+    # 30 Hz: SLAM/Nav2 TF lookup'larında LiDAR scan timestamp ile EKF TF arasındaki
+    # boşluk azalır; özellikle yerinde dönerken yaw interpolasyon hatası küçülür.
+    frequency: 30.0
+    sensor_timeout: 0.1      # IMU 100Hz, odom 50Hz; 0.1 s tampon yeterli
+    two_d_mode: true         # Düz zemin; z, roll, pitch sıfırlanır
+    transform_time_offset: 0.0
+    transform_timeout: 0.1
+    print_diagnostics: true
+    debug: false
+
+    # --------------- Frame'ler ---------------
+    map_frame:       map
+    odom_frame:      odom
+    base_link_frame: base_footprint
+    world_frame:     odom   # Çıkış odom frame'ine göre; AMCL map frame'ini handle eder
+
+    # --------------- TF yayını ---------------
+    # EKF, odom -> base_footprint TF'ini yayınlar (diff_drive_controller'da enable_odom_tf=false).
+    # Bu, füzyon edilmiş pozun TF tree'ye yansımasını sağlar; Nav2 ve maliyet haritaları doğru kullanır.
+    publish_tf: true
+    publish_acceleration: false
+
+    # ================================================================
+    # odom0 — Tekerlek enkoderi odometrisi
+    # /diff_drive_controller/odom  (nav_msgs/Odometry)
+    #
+    # Durum vektörü indisleri:
+    #   [x, y, z, roll, pitch, yaw, vx, vy, vz, vroll, vpitch, vyaw, ax, ay, az]
+    # ================================================================
+    odom0: /diff_drive_controller/odom
+    odom0_config: [false,  false,  false,   # x, y, z
+                   false, false, false,    # roll, pitch, yaw
+                   true,  true, false,   # vx, vy, vz
+                   false, false, true,    # vroll, vpitch, vyaw
+                   false, false, false]   # ax, ay, az
+    odom0_queue_size: 2
+    odom0_nodelay: true
+    odom0_differential: false  # Pozisyon ve hız doğrudan kullanılır
+    odom0_relative: true
+
+    # ================================================================
+    # imu0 — IMU (ataletsel ölçüm birimi)
+    # /imu  (sensor_msgs/Imu)
+    #
+    # Gazebo IMU plugin'i model spawn oryantasyonuna göre mutlak quaternion verir;
+    # robot (0,0,0) yaw=0 ile spawn edildiğinden imu0_relative=false ile direkt
+    # kullanılabilir. Relative=true iken başlangıç sallantısı bias yaratıyor ve
+    # yerinde dönerken yaw drift'i artıyordu.
+    # ================================================================
+    imu0: /imu
+    imu0_config: [false, false, false,   # x, y, z (IMU pozisyon vermez)
+                  false, false, true,    # roll, pitch, yaw (mutlak oryantasyon)
+                  false, false, false,   # vx, vy, vz
+                  false, false, true,    # vroll, vpitch, vyaw (jiroskop)
+                  false,  false, false]   # ax, ay, az (kullanılmıyor)
+    imu0_queue_size: 10
+    imu0_nodelay: true
+    imu0_differential: false
+    imu0_relative: false     # Gazebo IMU spawn oryantasyonuna göre; sim'de doğrudan kullan
+    imu0_remove_gravitational_acceleration: true
+
+    # ================================================================
+    # Süreç gürültüsü kovaryans matrisi (15x15 köşegen)
+    # Sıra: x, y, z, roll, pitch, yaw, vx, vy, vz, vroll, vpitch, vyaw, ax, ay, az
+    # Daha büyük değer → model belirsizliği → ölçüme daha fazla güven
+    # ================================================================
+    process_noise_covariance: [0.05,  0.0,   0.0,   0.0,   0.0,   0.0,   0.0,    0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,
+                               0.0,   0.05,  0.0,   0.0,   0.0,   0.0,   0.0,    0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,
+                               0.0,   0.0,   0.06,  0.0,   0.0,   0.0,   0.0,    0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,
+                               0.0,   0.0,   0.0,   0.03,  0.0,   0.0,   0.0,    0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,
+                               0.0,   0.0,   0.0,   0.0,   0.03,  0.0,   0.0,    0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,
+                               0.0,   0.0,   0.0,   0.0,   0.0,   0.06,  0.0,    0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,
+                               0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.025,  0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,
+                               0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,    0.025, 0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,
+                               0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,    0.0,   0.04,  0.0,   0.0,   0.0,   0.0,   0.0,   0.0,
+                               0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,    0.0,   0.0,   0.01,  0.0,   0.0,   0.0,   0.0,   0.0,
+                               0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,    0.0,   0.0,   0.0,   0.01,  0.0,   0.0,   0.0,   0.0,
+                               0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,    0.0,   0.0,   0.0,   0.0,   0.02,  0.0,   0.0,   0.0,
+                               0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,    0.0,   0.0,   0.0,   0.0,   0.0,   0.01,  0.0,   0.0,
+                               0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,    0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.01,  0.0,
+                               0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,    0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.0,   0.015]

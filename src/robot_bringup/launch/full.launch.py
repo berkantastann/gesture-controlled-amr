@@ -98,6 +98,33 @@ def generate_launch_description():
         output='screen',
     )
 
+    # Ground truth odom: Ignition OdometryPublisher plugin -> /ground_truth/odom
+    # Plugin'in TF'i Gazebo dahili kalır (ros_gz_bridge'de bridge edilmez); ROS /tf temiz.
+    # header.frame_id = ground_truth_odom (diff_drive 'odom'undan ayrı, çakışma yok)
+    ground_truth_bridge = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        arguments=[
+            '/model/amr/odometry@nav_msgs/msg/Odometry[gz.msgs.Odometry',
+        ],
+        remappings=[('/model/amr/odometry', '/ground_truth/odom')],
+        parameters=[{'use_sim_time': True}],
+        output='screen',
+    )
+
+    # Static TF: odom -> ground_truth_odom (identity).
+    # Amaç: RViz'de fixed_frame=odom seçildiğinde ground_truth/odom Odometry
+    # display'i de aynı pencerede görünsün ve diff_drive/EKF ile birebir karşılaştırılabilsin.
+    # Robot (0,0,0)'da spawn edildiği için iki frame başlangıçta üst üste; sapma = enkoder/EKF hatası.
+    ground_truth_static_tf = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='odom_to_ground_truth_odom',
+        arguments=['0', '0', '0', '0', '0', '0', 'odom', 'ground_truth_odom'],
+        parameters=[{'use_sim_time': True}],
+        output='screen',
+    )
+
     after_spawn_jsb = RegisterEventHandler(
         event_handler=OnProcessExit(
             target_action=spawn_entity,
@@ -127,6 +154,8 @@ def generate_launch_description():
         robot_state_publisher_node,
         spawn_entity,
         bridge,
+        ground_truth_bridge,
+        ground_truth_static_tf,
         cmd_vel_relay,
         after_spawn_jsb,
         after_jsb_diff_and_lift,

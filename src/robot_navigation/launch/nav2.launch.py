@@ -74,7 +74,18 @@ def generate_launch_description():
             }.items(),
         )
 
-        actions = [bringup_launch, localization_launch, navigation_launch]
+        ekf_node = Node(
+            package='robot_localization',
+            executable='ekf_node',
+            name='ekf_filter_node',
+            output='screen',
+            parameters=[
+                os.path.join(nav_share, 'params', 'ekf_params.yaml'),
+                {'use_sim_time': use_sim_time == 'true'},
+            ],
+        )
+
+        actions = [bringup_launch, ekf_node, localization_launch, navigation_launch]
 
         if use_rviz.lower() == 'true':
             actions.append(Node(

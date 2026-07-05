@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="DeliverPayload">
+
+  <TreeNodesModel>
+
+    <Action ID="NavigateToPose">
+      <input_port name="goal">Hedef: 'x;y;theta' formatinda</input_port>
+    </Action>
+
+    <Action ID="LiftControl">
+      <input_port name="effort">Hareket kuvveti (N)</input_port>
+      <input_port name="target_position">Hedef pozisyon (m) — belirtilirse pozisyon beklenir</input_port>
+      <input_port name="tolerance" default="0.005">Pozisyon toleransi (m)</input_port>
+      <input_port name="timeout" default="8.0">Max bekleme suresi (s)</input_port>
+      <input_port name="hold_effort" default="0.0">Tutma kuvveti (N)</input_port>
+    </Action>
+
+    <Action ID="WaitSeconds">
+      <input_port name="seconds">Bekleme suresi (s)</input_port>
+    </Action>
+
+  </TreeNodesModel>
+
+  <BehaviorTree ID="DeliverPayload">
+    <Sequence name="deliver_sequence">
+
+      <!-- 1. A noktasına git -->
+      <NavigateToPose name="go_to_A" goal="{point_A}"/>
+
+      <!-- 2. Lift kaldır — 0.14m'ye ulaşana kadar bekle (max 8s), sonra 100N tut -->
+      <!-- lift_joint max=0.15m; 0.14m hedefe ulaşınca "tam kalktı" sayılır -->
+      <LiftControl name="lift_up"
+                   effort="100.0"
+                   target_position="0.14"
+                   tolerance="0.005"
+                   timeout="8.0"
+                   hold_effort="100.0"/>
+
+      <!-- 3. B noktasına git — bu süre boyunca timer 100N yayınlar, lift yukarda kalır -->
+      <NavigateToPose name="go_to_B" goal="{point_B}"/>
+
+      <!-- 4. Lift indir — 0.01m'ye ulaşana kadar bekle, sonra -100N tut -->
+      <LiftControl name="lift_down"
+                   effort="-100.0"
+                   target_position="0.01"
+                   tolerance="0.005"
+                   timeout="8.0"
+                   hold_effort="-100.0"/>
+
+      <!-- 5. B noktasında 5 saniye bekle -->
+      <WaitSeconds name="wait_at_B" seconds="5.0"/>
+
+    </Sequence>
+  </BehaviorTree>
+
+</root>

@@ -33,4 +33,7 @@
   <!-- ros2_control + ign_ros2_control plugin (cmd_vel, odom, lift, joint_states) -->
   <xacro:include filename="$(find robot_description)/urdf/control/ros2_control.xacro"/>
 
+  <!-- Ground truth odom: Ignition OdometryPublisher → /ground_truth/odom -->
+  <xacro:include filename="$(find robot_description)/urdf/gazebo/gazebo_ground_truth.xacro"/>
+
 </robot>

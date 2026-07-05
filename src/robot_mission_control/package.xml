@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>robot_mission_control</name>
+  <version>0.0.0</version>
+  <description>BehaviorTree.CPP tabanlı AMR görev yöneticisi: NavigateToPose + LiftControl</description>
+  <maintainer email="btastan9@gmail.com">berkantastan</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- ROS 2 çekirdek -->
+  <depend>rclcpp</depend>
+  <depend>rclcpp_action</depend>
+
+  <!-- BehaviorTree.CPP v3 — Nav2 ile aynı versiyon (ROS Humble'da kurulu) -->
+  <depend>behaviortree_cpp_v3</depend>
+
+  <!-- Nav2 NavigateToPose action tanımı -->
+  <depend>nav2_msgs</depend>
+
+  <!-- Lift controller: Float64MultiArray -->
+  <depend>std_msgs</depend>
+
+  <!-- Lift pozisyon takibi: JointState -->
+  <depend>sensor_msgs</depend>
+
+  <!-- NavigateToPose hedef konumu: PoseStamped -->
+  <depend>geometry_msgs</depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

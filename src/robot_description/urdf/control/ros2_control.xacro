@@ -15,8 +15,8 @@
     Topic'ler (controller_manager bunları yayınlar/dinler):
       /cmd_vel                                -> launch'taki relay ile
                                                  /diff_drive_controller/cmd_vel_unstamped
-      /diff_drive_controller/odom             -> nav_msgs/Odometry
-      /tf (odom->base_footprint)              -> diff_drive_controller
+      /diff_drive_controller/odom             -> nav_msgs/Odometry (ham enkoder)
+      /tf (odom->base_footprint)              -> diff_drive_controller (EKF publish_tf=false)
       /lift_controller/commands               -> std_msgs/Float64MultiArray (tek elemanlı)
       /joint_states                           -> joint_state_broadcaster
   -->

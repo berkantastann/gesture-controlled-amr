@@ -39,7 +39,9 @@
   <gazebo reference="lidar_link">
     <sensor name="lidar_sensor" type="gpu_lidar">
       <always_on>1</always_on>
-      <update_rate>10</update_rate>
+      <!-- 20 Hz: yerinde donerken motion distortion azalir;
+           10 Hz'de 1 tarama suresince ~11° donus oluyordu -->
+      <update_rate>20</update_rate>
       <visualize>true</visualize>
       <topic>scan</topic>
       <gz_frame_id>lidar_link</gz_frame_id>

@@ -45,12 +45,18 @@ diff_drive_controller:
     odom_frame_id: odom
     base_frame_id: base_footprint
 
+    # Pose covariance az; twist'te yaw rate'i (son eleman) kasıtlı yüksek tutuyoruz
+    # çünkü yerinde dönerken caster sürtünmesi/wheel slip nedeniyle encoder vyaw
+    # gerçek dönüş hızından sapabiliyor. EKF bu sayede IMU vyaw'a daha çok güvenir.
     pose_covariance_diagonal:  [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]
-    twist_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]
+    twist_covariance_diagonal: [0.01,  0.01,  0.001, 0.001, 0.001, 0.05]
 
     open_loop: false
     position_feedback: true
-    enable_odom_tf: true
+    # TF rejimi: diff_drive sadece /diff_drive_controller/odom topic'ini yayar (ham enkoder).
+    # odom -> base_footprint TF'i robot_localization EKF tarafından yayınlanır (füzyon sonucu).
+    # Bu sayede Nav2 ve diğer node'lar drift'i azaltılmış füzyon pozunu görür.
+    enable_odom_tf: false
 
     cmd_vel_timeout: 0.5
     publish_limited_velocity: false
