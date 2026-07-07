@@ -43,6 +43,7 @@ def generate_launch_description():
     use_rviz        = LaunchConfiguration('use_rviz')
     rviz_config     = LaunchConfiguration('rviz_config')
 
+    # RViz'i bringup yerine burada mapping.rviz config'iyle açıyoruz
     bringup_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -50,6 +51,7 @@ def generate_launch_description():
                 'launch', 'full.launch.py',
             )
         ),
+        launch_arguments={'use_rviz': 'false'}.items(),
     )
 
 
@@ -75,7 +77,6 @@ def generate_launch_description():
         ],
     )
 
-    # bringupda mevcut burada eklemedim 
     rviz_node = Node(
         package='rviz2',
         executable='rviz2',
@@ -94,4 +95,5 @@ def generate_launch_description():
         bringup_launch,
         ekf_node,
         slam_toolbox_node,
+        rviz_node,
     ])

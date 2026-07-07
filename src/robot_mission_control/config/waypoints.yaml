@@ -12,5 +12,6 @@
 
 mission_executor:
   ros__parameters:
+    use_sim_time: true        # Gazebo sim saati — goal stamp'leri ve timeout'lar tutarlı olsun
     point_A: "3.0;0.0;0.0"    # Yük alma noktası — 3m ileri, +X yönüne bak
     point_B: "0.0;3.0;1.5708" # Yük bırakma noktası — 3m sola, +Y yönüne bak

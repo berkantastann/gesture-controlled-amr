@@ -112,7 +112,11 @@ class HandsControlNode(Node):
                     left_pinch = True
 
         self.cmd_vel_pub.publish(self._compute_twist(left_pinch, right_pinch))
-        self.lift_pub.publish(self._compute_lift(lift_up, lift_down))
+        # Boş data JointGroupEffortController'da boyut hatasına yol açar;
+        # komut yokken yayınlama, son effort geçerli kalsın.
+        lift_msg = self._compute_lift(lift_up, lift_down)
+        if lift_msg.data:
+            self.lift_pub.publish(lift_msg)
 
         self._draw_hud(frame, left_pinch, right_pinch, lift_up, lift_down, index_y_in_zone)
         cv2.imshow('Gesture Control', frame)

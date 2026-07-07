@@ -92,6 +92,7 @@ BT::NodeStatus LiftControl::tick()
                     std::chrono::duration<double>(duration);
     rclcpp::Rate rate(10);
     while (std::chrono::steady_clock::now() < end_time && rclcpp::ok()) {
+      rclcpp::spin_some(node_);  // lift effort timer'ı bekleme sirasinda da yayinlasin
       rate.sleep();
     }
   }
