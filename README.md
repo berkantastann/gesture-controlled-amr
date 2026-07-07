@@ -3,7 +3,9 @@
 Depoda yük taşıyan, engellerden kaçınan ve el hareketleriyle manuel kontrol edilebilen otonom mobil robot (AMR) simülasyonu. Gazebo Fortress üzerinde diferansiyel sürüşlü bir platform; SLAM ile harita çıkarıyor, Nav2 ile navigasyon yapıyor, BehaviorTree.CPP ile "yük al → taşı → bırak" görevini otonom yürütüyor ve MediaPipe tabanlı el hareketi tanıma ile de sürülebiliyor.
 
 <p align="center">
-  <img src="readme/navigation.png" width="90%" alt="Nav2 navigation & costmap"/>
+  <a href="https://www.youtube.com/watch?v=XV6nqqHECoE">
+    <img src="https://img.youtube.com/vi/XV6nqqHECoE/maxresdefault.jpg" width="90%" alt="Proje demo videosu — YouTube'da izlemek için tıkla"/>
+  </a>
 </p>
 
 ## Demo
